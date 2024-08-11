@@ -21,9 +21,11 @@ model, tokenizer = get_default_model()
 
 if __name__ == '__main__':
     lang_to = args.to
+    # If input_text is sigle-line string
     if args.input_text:
         text = args.input_text
         print(translate(text, lang_to))
+    # If input_text is piped, multi-line string
     else:
         text_list = sys.stdin.read().splitlines()
         for text in text_list:
