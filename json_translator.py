@@ -14,17 +14,16 @@ from core.translate import get_default_model, translate
 parser = argparse.ArgumentParser(
     description="Parse json and translate value of json properties"
 )
-parser.add_argument('--to', action='store_const', default='ko',
+parser.add_argument('--to', default='ko',
                     help='ISO code of destination language. defaults to ko(Korean). See https://huggingface.co/languages for language codes')
-parser.add_argument('--out', action='store_const',
+parser.add_argument('--out',
                     help='A name of output file. Defaults to ${json_file}_${--to}.json')
-parser.add_argument('json_file', required=True,
-                    help='A file containing json')
+parser.add_argument('json_file', help='A file containing json')
 
 args = parser.parse_args()
 
 # Define input / output files
-json_file, lang_to, out = parser.json_file, parser.to, parser.out
+json_file, lang_to, out = args.json_file, args.to, args.out
 out_file = f'{json_file}_{lang_to}.json'
 if out:
     out_file = out
@@ -41,8 +40,8 @@ def parse_json(json_file: str) -> Dict[str, str | object]:
         with open(json_file) as f:
             data = json.load(f)
             return data
-    except Exception:
-        print(Exception)
+    except Exception as e:
+        print(e)
         return None
 
 
@@ -50,22 +49,22 @@ def traverse_json(json_data: Dict[str, str | object], model: PreTrainedModel, to
     for key, value in json_data.items():
         # If value is dict(nested object), traverse
         if type(value) is dict:
-            traverse_json(json_data, model, tokenizer)
+            traverse_json(value, model, tokenizer)
         # If value is string, translate value and store it into original json object
         if type(value) is str:
             json_data[key] = translate(
-                model, tokenizer, json_data[key], lang_to)
+                model, tokenizer, value, lang_to)
 
 
 if __name__ == '__main__':
 
-    # Load model and tokenizer
-    model, tokenizer = get_default_model()
-
-    json_data = parse_json()
+    json_data = parse_json(json_file)
     if not json_data:
         print('Unable to parse file to json.')
         exit(1)
+
+    # Load model and tokenizer
+    model, tokenizer = get_default_model()
 
     traverse_json(json_data, model, tokenizer)
 
