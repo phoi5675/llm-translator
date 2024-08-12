@@ -17,17 +17,25 @@ pip3 install -r requirements.txt
 
 ### Single string or piped input
 
+Translate simple string, or multi line string using pipe.  
+`python main.py --help` for full usage examples.
+
 ```python
 # single string
-python --to 'ko' 'Hello world!'
+python main.py --to 'ko' 'Hello world!'
 
 # piped
-cat some_file | python --to 'ko'
+cat some_file | python main.py --to 'ko'
 ```
 
 ### JSON
 
-TBD
+Load source json file and save translated json to `--out` file.  
+`python json_translator.py --help` to see full usages.
+
+```python
+python json_translator.py --to ko --out ko.json en.json
+```
 
 ## References
 
